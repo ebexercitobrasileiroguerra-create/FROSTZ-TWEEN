@@ -28,8 +28,8 @@ screenGui.Name = "AntiCheatMenu"
 screenGui.Parent = playerGui
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 300)
-frame.Position = UDim2.new(0.5, -125, 0.5, -150)
+frame.Size = UDim2.new(0, 250, 0, 360) -- Aumentei altura para o novo botão
+frame.Position = UDim2.new(0.5, -125, 0.5, -180) -- Ajustei posição
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BackgroundTransparency = 0.15
 frame.BorderSizePixel = 0
@@ -80,7 +80,7 @@ title.Parent = frame
 -- Botão TELEGUIAR! (subido um pouco)
 local teleportBtn = Instance.new("TextButton")
 teleportBtn.Size = UDim2.new(0.8, 0, 0, 46)
-teleportBtn.Position = UDim2.new(0.1, 0, 0.18, 0) -- MAIS PRA CIMA
+teleportBtn.Position = UDim2.new(0.1, 0, 0.16, 0) -- MAIS PRA CIMA
 teleportBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 teleportBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 teleportBtn.Text = "TELEGUIAR!"
@@ -107,7 +107,7 @@ end)
 local espButton = Instance.new("TextButton")
 espButton.Name = "ESPButton"
 espButton.Size = UDim2.new(0.8, 0, 0, 46)
-espButton.Position = UDim2.new(0.1, 0, 0.35, 0)
+espButton.Position = UDim2.new(0.1, 0, 0.31, 0)
 espButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 espButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 espButton.Text = "ESP PLAYERS"
@@ -128,6 +128,34 @@ task.spawn(function()
 	while true do
 		task.wait(0.05)
 		espBtnStroke.Color = stroke.Color
+	end
+end)
+
+-- Botão SUPERMAN (novo botão)
+local supermanButton = Instance.new("TextButton")
+supermanButton.Name = "SupermanButton"
+supermanButton.Size = UDim2.new(0.8, 0, 0, 46)
+supermanButton.Position = UDim2.new(0.1, 0, 0.46, 0)
+supermanButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+supermanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+supermanButton.Text = "SUPERMAN"
+supermanButton.TextScaled = true
+supermanButton.Font = Enum.Font.GothamBold
+supermanButton.Parent = frame
+
+local supermanBtnCorner = Instance.new("UICorner")
+supermanBtnCorner.CornerRadius = UDim.new(0, 8)
+supermanBtnCorner.Parent = supermanButton
+
+local supermanBtnStroke = Instance.new("UIStroke")
+supermanBtnStroke.Thickness = 1.8
+supermanBtnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+supermanBtnStroke.Parent = supermanButton
+
+task.spawn(function()
+	while true do
+		task.wait(0.05)
+		supermanBtnStroke.Color = stroke.Color
 	end
 end)
 
@@ -290,3 +318,57 @@ local function toggleESP()
 end
 
 espButton.MouseButton1Click:Connect(toggleESP)
+
+-- Sistema Superman (Super Speed + Super Jump)
+local supermanEnabled = false
+local originalWalkSpeed = nil
+local originalJumpPower = nil
+
+local function toggleSuperman()
+	supermanEnabled = not supermanEnabled
+
+	local char = player.Character
+	if not char then return end
+
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+
+	if supermanEnabled then
+		-- Salva valores originais
+		originalWalkSpeed = humanoid.WalkSpeed
+		originalJumpPower = humanoid.JumpPower
+
+		-- Ativa super powers
+		humanoid.WalkSpeed = 100 -- Super Speed
+		humanoid.JumpPower = 150 -- Super Jump
+
+		supermanButton.Text = "SUPERMAN ON"
+		supermanButton.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Verde quando ativo
+	else
+		-- Restaura valores originais
+		if originalWalkSpeed then
+			humanoid.WalkSpeed = originalWalkSpeed
+		end
+		if originalJumpPower then
+			humanoid.JumpPower = originalJumpPower
+		end
+
+		supermanButton.Text = "SUPERMAN"
+		supermanButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Cor original
+	end
+end
+
+-- Restaura superman quando o personagem renascer
+player.CharacterAdded:Connect(function(char)
+	if supermanEnabled then
+		-- Pequeno delay para garantir que o humanoid carregou
+		task.wait(1)
+		local humanoid = char:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.WalkSpeed = 50
+			humanoid.JumpPower = 150
+		end
+	end
+end)
+
+supermanButton.MouseButton1Click:Connect(toggleSuperman)
